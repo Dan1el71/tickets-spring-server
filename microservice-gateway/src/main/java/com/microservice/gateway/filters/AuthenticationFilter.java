@@ -28,6 +28,12 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
+        if(request.getRequestURI().contains("/auth")){
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = getTokenFromRequest(request);
         if (token != null) {
             String username = jwtService.getUsernameFromToken(token);
@@ -42,7 +48,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
-
 
     private String getTokenFromRequest(HttpServletRequest request){
         try {
