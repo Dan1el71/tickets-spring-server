@@ -1,0 +1,127 @@
+version: '3.8'
+services:
+  config-server:
+    build:
+      context: ./microservice-config
+      dockerfile: Dockerfile
+    networks:
+      - microservices
+    ports:
+      - "8888:8888"
+    restart: on-failure
+
+  msvc-eureka:
+    build:
+      context: ./microservice-eureka
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    networks:
+      - microservices
+    ports:
+      - "8761:8761"
+    depends_on:
+      - config-server
+    restart: on-failure
+
+  msvc-gateway:
+    build:
+      context: ./microservice-gateway
+      dockerfile: Dockerfile
+    environment:
+        - SPRING_PROFILES_ACTIVE=prod
+    networks:
+      - microservices
+    ports:
+      - "8080:8080"
+    depends_on:
+      - config-server
+      - msvc-eureka
+    restart: on-failure
+
+  msvc-auth:
+    build:
+      context: ./microservice-authentication
+      dockerfile: Dockerfile
+    environment:
+        - SPRING_PROFILES_ACTIVE=prod
+    networks:
+      - microservices
+    ports:
+      - "8090:8090"
+    depends_on:
+      - config-server
+      - msvc-eureka
+      - db-msvc-auth
+    restart: on-failure
+
+  msvc-tickets:
+    build:
+      context: ./microservice-tickets
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    networks:
+      - microservices
+    ports:
+      - "9090:9090"
+    depends_on:
+      - config-server
+      - msvc-eureka
+      - db-msvc-tickets
+    restart: on-failure
+
+  msvc-chat:
+    build:
+      context: ./microservice-chat
+      dockerfile: Dockerfile
+    environment:
+        - SPRING_PROFILES_ACTIVE=prod
+    networks:
+      - microservices
+    ports:
+      - "8070:8070"
+    depends_on:
+      - config-server
+      - msvc-eureka
+      - db-msvc-chat
+    restart: on-failure
+
+  db-msvc-auth:
+    image: postgres:15.2
+    restart: unless-stopped
+    networks:
+      - microservices
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_DB: msvc-auth
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+
+  db-msvc-tickets:
+    image: postgres:15.2
+    restart: unless-stopped
+    networks:
+      - microservices
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: msvc-tickets
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+
+  db-msvc-chat:
+    image: postgres:15.2
+    restart: unless-stopped
+    networks:
+      - microservices
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: msvc-chat
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+networks:
+  microservices:
+    driver: bridge

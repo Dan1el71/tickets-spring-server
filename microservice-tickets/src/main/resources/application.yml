@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: msvc-tickets
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
