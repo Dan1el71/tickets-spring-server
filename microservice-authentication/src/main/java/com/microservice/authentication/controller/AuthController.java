@@ -19,9 +19,6 @@ public class AuthController {
     private final AuthService authService;
     private final JwtService jwtService;
 
-    @Value("${jwt.expiration}")
-    private String EXPIRATION;
-
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDto> register(@RequestBody RegisterRequestDto request, HttpServletResponse response){
         AuthResponseDto token = authService.register(request);
@@ -40,10 +37,5 @@ public class AuthController {
         response.addCookie(cookie);
 
         return ResponseEntity.ok(token);
-    }
-
-    @PostMapping("/guest")
-    public ResponseEntity<AuthResponseDto> loginGuest(@RequestBody LoginRequestDto request) {
-        return ResponseEntity.ok().build();
     }
 }

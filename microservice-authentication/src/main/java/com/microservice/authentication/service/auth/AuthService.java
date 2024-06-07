@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 public interface AuthService {
     AuthResponseDto login(LoginRequestDto request);
     AuthResponseDto register(RegisterRequestDto request);
-    AuthResponseDto loginAsGuest();
     UserDetails loadUserByUsername(String username);
     AccountResponseDto verify(String token);
 }

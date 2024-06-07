@@ -88,26 +88,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthResponseDto loginAsGuest() {
-        User user = userRepository.save(
-                User.builder()
-                        .name(RandomStringUtils.randomAlphabetic(5) + " " + RandomStringUtils.randomAlphabetic(5))
-                        .build()
-        );
-
-        Account account = accountRepository.save(
-                Account.builder()
-                        .userId(user)
-                        .isVerified(false)
-                        .provider("guest")
-                        .build()
-        );
-
-
-        return null;
-    }
-
-    @Override
     public Account loadUserByUsername(String username) {
         return accountRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));

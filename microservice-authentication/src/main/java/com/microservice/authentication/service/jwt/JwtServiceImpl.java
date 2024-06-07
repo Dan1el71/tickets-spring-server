@@ -4,6 +4,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
@@ -17,6 +19,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -122,5 +125,34 @@ public class JwtServiceImpl implements JwtService {
         long expMillis = Long.parseLong(EXPIRATION) * 1000;
         final Date now = new Date();
         return new Date(now.getTime() + expMillis);
+    }
+
+    @Override
+    public String getTokenFromRequest(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+
+        if(cookies != null){
+            return Arrays.stream(cookies)
+                    .filter(cookie -> cookie.getName().equals("auth"))
+                    .map(Cookie::getValue)
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        return null;
+    }
+
+    @Override
+    public Cookie createCookie(String token) {
+        Cookie cookie = new Cookie("auth", token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(getCookieMaxAge()); // 1 dia
+        return cookie;
+    }
+
+    private int getCookieMaxAge() {
+        return Integer.parseInt(EXPIRATION);
     }
 }
