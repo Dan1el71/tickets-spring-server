@@ -1,4 +1,4 @@
-package com.microservice.authentication.service.dto;
+package com.microservice.authentication.persistence.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

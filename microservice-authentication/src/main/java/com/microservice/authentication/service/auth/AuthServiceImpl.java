@@ -8,17 +8,17 @@ import com.microservice.authentication.persistence.model.Role;
 import com.microservice.authentication.persistence.model.User;
 import com.microservice.authentication.persistence.repository.AccountRepository;
 import com.microservice.authentication.persistence.repository.UserRepository;
-import com.microservice.authentication.service.dto.AuthResponseDto;
-import com.microservice.authentication.service.dto.LoginRequestDto;
-import com.microservice.authentication.service.dto.RegisterRequestDto;
+import com.microservice.authentication.persistence.dto.account.AccountMapper;
+import com.microservice.authentication.persistence.dto.account.AccountResponseDto;
+import com.microservice.authentication.persistence.dto.AuthResponseDto;
+import com.microservice.authentication.persistence.dto.LoginRequestDto;
+import com.microservice.authentication.persistence.dto.RegisterRequestDto;
 import com.microservice.authentication.service.jwt.JwtService;
-import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +33,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final AccountMapper accountMapper;
 
     @Override
     public AuthResponseDto login(LoginRequestDto request) {
@@ -54,9 +55,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponseDto register(RegisterRequestDto request) {
         accountRepository.findByUsername(request.getUsername()).ifPresent(
-            account -> {
-                throw new UserAlreadyExistsException("User already exists");
-            }
+                account -> {
+                    throw new UserAlreadyExistsException("User already exists");
+                }
         );
 
         User user = User.builder()
@@ -90,7 +91,7 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponseDto loginAsGuest() {
         User user = userRepository.save(
                 User.builder()
-                        .name(RandomStringUtils.randomAlphabetic(5)+ " " + RandomStringUtils.randomAlphabetic(5))
+                        .name(RandomStringUtils.randomAlphabetic(5) + " " + RandomStringUtils.randomAlphabetic(5))
                         .build()
         );
 
@@ -102,14 +103,25 @@ public class AuthServiceImpl implements AuthService {
                         .build()
         );
 
-        
 
         return null;
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
+    public Account loadUserByUsername(String username) {
         return accountRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @Override
+    public AccountResponseDto verify(String token) {
+        String username = jwtService.getUsernameFromToken(token);
+        Account account = loadUserByUsername(username);
+
+        if (account == null) {
+            throw new ResourceNotFoundException("User not found");
+        }
+
+        return accountMapper.toAccountResponseDto(account);
     }
 }
