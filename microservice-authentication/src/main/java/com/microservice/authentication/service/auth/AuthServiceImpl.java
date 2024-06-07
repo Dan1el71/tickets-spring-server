@@ -15,7 +15,6 @@ import com.microservice.authentication.persistence.dto.LoginRequestDto;
 import com.microservice.authentication.persistence.dto.RegisterRequestDto;
 import com.microservice.authentication.service.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
