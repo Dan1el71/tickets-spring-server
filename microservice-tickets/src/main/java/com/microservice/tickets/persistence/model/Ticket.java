@@ -23,6 +23,8 @@ public class Ticket {
     private UUID id;
 
     private String reason;
+
+    @Column(length = 2000)
     private String description;
 
     @Enumerated(EnumType.STRING)
