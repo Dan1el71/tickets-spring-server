@@ -81,7 +81,7 @@ public class GlobalExceptionHandler {
                 .errorCode("NOT_ABLE_TO_SAVE")
                 .build();
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .status(HttpStatus.BAD_REQUEST)
                 .body(errorDetails);
     }
 
