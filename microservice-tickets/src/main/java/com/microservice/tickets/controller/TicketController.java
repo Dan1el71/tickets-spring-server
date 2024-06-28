@@ -6,7 +6,6 @@ import com.microservice.tickets.service.dto.TicketDto;
 import com.microservice.tickets.service.dto.TicketToSaveDto;
 import com.microservice.tickets.service.ticket.TicketService;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.QueryParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,9 +35,13 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.listTicketsByStatus(status));
     }
 
-    @GetMapping("/search?reason={search}")
-    public ResponseEntity<String> TicketsByReason(@PathVariable("search") String search){
-        return ResponseEntity.ok("Not implemented");
+    @GetMapping("/search")
+    public ResponseEntity<TicketsResponseDto> TicketsByReason(
+            @RequestParam(value = "reason",required = false) String reason,
+            @RequestParam(value = "page",defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+            ){
+        return ResponseEntity.ok(ticketService.searchTicket(reason,page,size)) ;
     }
 
     @GetMapping("/{id}")
