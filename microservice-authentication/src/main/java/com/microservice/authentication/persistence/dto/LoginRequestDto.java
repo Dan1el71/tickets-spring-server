@@ -1,4 +1,4 @@
-package com.microservice.authentication.service.dto;
+package com.microservice.authentication.persistence.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequestDto {
-    String name;
+public class LoginRequestDto {
     String username;
-    String email;
     String password;
 }
