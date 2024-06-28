@@ -9,5 +9,5 @@ import java.util.UUID;
 
 public interface TicketRepository extends JpaRepository<Ticket, UUID> {
     List<Ticket> findByStatus(Status status);
-    List<Ticket> findByReason(String reason);
+    List<Ticket> findByReasonContainingIgnoreCase(String reason);
 }

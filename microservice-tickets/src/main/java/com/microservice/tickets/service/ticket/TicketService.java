@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface TicketService {
     TicketsResponseDto listAllTickets();
-    List<TicketDto> searchTicketsByReason(String search);
+    TicketsResponseDto searchTicket(String search, int page, int size);
     TicketDto createTicket(TicketToSaveDto ticketToSaveDto);
     List<TicketDto> listTicketsByStatus(String status);
     TicketDto getTicketById(UUID id);

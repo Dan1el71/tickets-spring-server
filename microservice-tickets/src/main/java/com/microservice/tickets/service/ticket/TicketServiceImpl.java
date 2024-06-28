@@ -40,8 +40,27 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public List<TicketDto> searchTicketsByReason(String search) {
-        return List.of();
+    public TicketsResponseDto searchTicket(String search, int page, int size) {
+        List<Ticket> tickets = ticketRepository.findByReasonContainingIgnoreCase(search);
+
+        long totalTickets = tickets.size();
+
+        if (totalTickets == 0) {
+            throw new ItemNotFoundException("No tickets found");
+        }
+
+        List<TicketDto> ticketDto = paginateTickets(tickets, page, size).stream()
+                .map(ticketMapper::toDto)
+                .collect(Collectors.toList());
+
+        return new TicketsResponseDto(ticketDto, totalTickets);
+    }
+
+    private List<Ticket> paginateTickets(List<Ticket> tickets, int page, int size) {
+        return tickets.stream()
+                .skip((long) page * size)
+                .limit(size)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -80,13 +99,19 @@ public class TicketServiceImpl implements TicketService {
     @Override
     @Transactional
     public TicketDto updateTicket(UUID id, TicketToSaveDto ticketToSaveDto) {
-        ticketRepository.findById(id)
-                .orElseThrow(() -> new ItemNotFoundException("Ticket not found"));
+        return ticketRepository.findById(id).map(ticket -> {
+            ticket.setReason(ticketToSaveDto.reason());
+            ticket.setDescription(ticketToSaveDto.description());
+            ticket.setPriority(ticketToSaveDto.priority());
+            ticket.setStatus(ticketToSaveDto.status());
+            ticket.setAssigneeId(ticketToSaveDto.assigneeId());
+            ticket.setUserId(ticketToSaveDto.userId());
+            ticket.setComments(ticketToSaveDto.comments());
+            ticket.setQualification(ticketToSaveDto.qualification());
 
-        Ticket updatedTicket = ticketMapper.toEntity(ticketToSaveDto);
-        Ticket savedTicket = ticketRepository.save(updatedTicket);
-
-        return ticketMapper.toDto(savedTicket);
+            Ticket updatedTicket = ticketRepository.save(ticket);
+            return ticketMapper.toDto(updatedTicket);
+        }).orElseThrow(() -> new ItemNotFoundException("Ticket not found"));
     }
 
     @Override
