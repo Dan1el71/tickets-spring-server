@@ -8,7 +8,7 @@ spring:
         git:
           uri: https://github.com/Dan1el71/tickets-config-server
           skip-ssl-validation: true
-          username: Dan1el71
-          password: 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
+          username: -
+          password: -
           search-paths: configurations
         bootstrap: true
